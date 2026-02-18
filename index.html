@@ -9,19 +9,21 @@
   <script src="https://cdn.jsdelivr.net/npm/mind-ar@1.2.5/dist/mindar-image-aframe.prod.js"></script>
 
   <style>
-    body { margin: 0; overflow: hidden; }
+    body {
+      margin: 0;
+      overflow: hidden;
+    }
 
-    #soundBtn {
+    #tapHint {
       position: fixed;
       bottom: 20px;
       left: 50%;
       transform: translateX(-50%);
-      padding: 12px 20px;
-      font-size: 16px;
       background: rgba(0,0,0,0.7);
       color: white;
-      border: none;
-      border-radius: 8px;
+      padding: 10px 16px;
+      border-radius: 6px;
+      font-size: 14px;
       z-index: 999;
     }
   </style>
@@ -29,7 +31,7 @@
 
 <body>
 
-<button id="soundBtn">🔊 Tap to Enable Sound</button>
+<div id="tapHint">🔊 Tap once for sound</div>
 
 <a-scene
   mindar-image="imageTargetSrc: poster.mind; autoStart: true;"
@@ -40,8 +42,8 @@
     <video
       id="video"
       src="video.mp4"
-      muted
       loop
+      muted
       playsinline
       webkit-playsinline
       crossorigin="anonymous">
@@ -57,8 +59,17 @@
 </a-scene>
 
 <script>
-  const video = document.querySelector("#video");
-  const btn = document.querySelector("#soundBtn");
+  const video = document.getElementById("video");
+  const tapHint = document.getElementById("tapHint");
+
+  // unlock sound on first user interaction
+  document.body.addEventListener("click", () => {
+    if (video.muted) {
+      video.muted = false;
+      video.play();
+      tapHint.style.display = "none";
+    }
+  }, { once: true });
 
   document.addEventListener("targetFound", () => {
     video.play().catch(() => {});
@@ -66,12 +77,6 @@
 
   document.addEventListener("targetLost", () => {
     video.pause();
-  });
-
-  btn.addEventListener("click", () => {
-    video.muted = false;
-    video.play();
-    btn.style.display = "none";
   });
 </script>
 
